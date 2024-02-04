@@ -1,0 +1,7 @@
+In the proposed system Image dataset is been used whereas in the existing system
+numerical dataset is used. ResNet50 can automatically learn and extract necessary features
+from dental images eliminating the need for additional process. This advantage overcomes
+one of the limitation of Random Forest which requires explicit feature extraction.
+ResNet50’s architecture allows it to learn hierarchical representations of dental images
+capturing both low level and high level features outperforming Random Forest which may
+struggle to capture intricate images.
