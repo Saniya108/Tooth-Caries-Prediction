@@ -1,0 +1,6 @@
+Proposed System:
+The proposed technique for dental caries prediction seeks to foretell whether there will be
+caries or not. Deep learning has demonstrated a wide range of benefits for dental health
+care. Our project focuses on extracting features from dental photos and achieving accurate
+performance using ResNet50, a Convolutional Neural Network (CNN) with 50 layers. The
+proposed system strives to improve the accuracy and efficiency of tooth decay prediction.
