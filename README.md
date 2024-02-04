@@ -11,6 +11,8 @@ criticism during the project completion phase. Finally, we are very much indebte
 parents for their moral support and encouragement to achieve goals.
 
 **Abstract**
+
+
 One of the most prevalent dental conditions impacting people globally is tooth decay. It can lead
 to severe pain and discomfort, which is why early detection is crucial for timely treatment. Oral
 health is an extremely complicated area of medicine that includes conditions like tooth caries,
