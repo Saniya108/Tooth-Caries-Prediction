@@ -1,5 +1,7 @@
-#**TOOTH CARIES PREDICTION**
-# ACKNOWLEDGEMENT
+#TOOTH CARIES PREDICTION
+
+**ACKNOWLEDGEMENT**
+
 There are many people who helped us directly and indirectly to complete our project
 successfully. We would like to take this opportunity to thank one and all. First we wish to
 express our deep gratitude towards our internal guide Dr. K. Madhavi, Professor & HOD,
