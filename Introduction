@@ -1,4 +1,4 @@
- **1.1 Existing System:**
+**1.1 Existing System:**
 The DCP (Dental Caries Prediction) model, which implements preventive measures or
 diagnostic solutions for dental caries, was proposed for the current system. Using the
 Random Forest approach, extraneous features were removed from the data before it was
