@@ -1,0 +1,198 @@
+Tooth caries prediction using the ResNet-50 algorithm can be implemented using the Streamlit framework with a local tunnel in Google Colab. Here are the complete installation steps:
+
+1.Setting up Google Colab:
+  -- Open Google Colab in our web browser (https://colab.research.google.com/).
+  --Creating a new notebook or opening an existing one
+  --Importing Drive into google colab using following commands:
+      i.e ''' from google.colab import drive
+              drive.mount('/content/drive')    '''
+    
+
+2. Importing all Required libraries:
+   - In a code cell, import the necessary libraries:
+     '''
+       import os
+       import cv2
+       from PIL import Image
+       import tensorflow as tf
+       from keras import backend as K
+       from keras.models import load_model
+       from tensorflow.keras.utils import img_to_array
+       from tensorflow.keras.optimizers import Adam, RMSprop
+       from tensorflow.keras.callbacks import ReduceLROnPlateau
+       from tensorflow.keras.preprocessing.image import ImageDataGenerator  
+     '''
+3.Creating Variables to store Directory paths:
+   -Run the following commands create variables to these directories:
+    ''' 
+       base_dir = '/content/drive/MyDrive/DENTALDESIESE/dataset'
+       train_dir = '/content/drive/MyDrive/DENTALDESIESE/dataset/train'
+       train_healthy_dir = '/content/drive/MyDrive/DENTALDESIESE/dataset/train/healthy'
+       train_unhealthy_dir = '/content/drive/MyDrive/DENTALDESIESE/dataset/train/unhealthy'
+       test_dir = '/content/drive/MyDrive/DENTALDESIESE/dataset/val'
+       test_healthy_dir = '/content/drive/MyDrive/DENTALDESIESE/dataset/val/healthy'
+       test_unhealthy_dir = '/content/drive/MyDrive/DENTALDESIESE/dataset/val/unhealthy'
+       valid_dir = '/content/drive/MyDrive/DENTALDESIESE/dataset/val'
+       valid_healthy_dir = '/content/drive/MyDrive/DENTALDESIESE/dataset/val/healthy'
+      valid_unhealthy_dir = '/content/drive/MyDrive/DENTALDESIESE/dataset/val/unhealthy'
+   '''
+ ---
+'''
+     num_healthy_train = len(os.listdir(train_healthy_dir))
+      num_unhealthy_train = len(os.listdir(train_unhealthy_dir))
+      num_healthy_validaition = len(os.listdir(valid_healthy_dir))
+      num_unhealthy_validation= len(os.listdir(valid_unhealthy_dir))
+      num_healthy_test = len(os.listdir(test_healthy_dir))
+      num_unhealthy_test= len(os.listdir(test_unhealthy_dir))
+ '''
+
+4. Data Preprocessing :
+  -- resizing the image,
+   '''
+    image_gen_train = ImageDataGenerator(rescale = 1./255)
+    train_data_gen = image_gen_train.flow_from_directory(batch_size=batch_size,
+    directory = train_dir,
+    shuffle= True,
+    target_size = (IMG_SHAPE,IMG_SHAPE),
+    class_mode = 'binary')
+    image_generator_validation = ImageDataGenerator(rescale=1./255)
+    val_data_gen = image_generator_validation.flow_from_directory(batch_size=batch_size,
+    directory=valid_dir,
+    target_size=(IMG_SHAPE, IMG_SHAPE),
+    class_mode='binary')
+    image_gen_test = ImageDataGenerator(rescale=1./255)
+    test_data_gen = image_gen_test.flow_from_directory(batch_size=batch_size,
+    directory=test_dir,
+    target_size=(IMG_SHAPE, IMG_SHAPE),
+    class_mode='binary')
+  '''
+5.Load the Pretrained ResNet-50 Model:
+  -- In a code cell,load the pretrained Resenet 50 model from tensorflow library
+  ''' 
+    pre_trained_model = tf.keras.applications.ResNet50(
+    input_shape=(224, 224, 3),
+    include_top=False,
+    weights="imagenet")
+  --  '''for layer in pre_trained_model.layers:
+          print(layer.name)
+          layer.trainable = False
+     '''
+  
+6.Importing layer to train our Resenet-50 base model:
+-- In a code cell, using below code
+ '''
+   last_layer = pre_trained_model.get_layer('conv5_block3_out')
+   last_output = last_layer.output
+   x = tf.keras.layers.GlobalMaxPooling2D()(last_output)
+   x = tf.keras.layers.Dense(512, activation='relu')(x)
+   x = tf.keras.layers.Dropout(0.5)(x)
+   x = tf.keras.layers.Dense(2, activation='sigmoid')(x)
+ '''
+--''' model = tf.keras.Model(pre_trained_model.input, x) '''
+
+7.Compiling our model using adam optimizer by specifying loss function:
+---In a code cell, by running below code :
+   '''model.compile(optimizer='adam', loss=tf.keras.losses.sparse_categorical_crossentropy, metrics=['acc'])'''
+
+8.Training the resnet-50 model using preprocessed data:
+  --In a code cell,run the following commands:
+   ''' res_classifier = model.fit(train_data_gen,
+      steps_per_epoch=(total_train//batch_size),
+      epochs = 8,
+      validation_data=val_data_gen,
+      validation_steps=(total_validation//batch_size),
+       batch_size = batch_size,
+        verbose = 1)'''
+
+9.Evalulating our model using different performance metrics:
+ --In a code cell, run the following commands,
+    ''' 
+     result = model.evaluate(test_data_gen,batch_size=batch_size)
+     print("test_loss, test accuracy",result)
+    '''
+
+10.Saving Our model to disk:
+   -- In a code cell,use this code,
+    '''model_json = model.to_json()
+with open("/content/drive/MyDrive/DENTALDESIESE/res_dental_Classifier.json", "w") as json_file:
+  json_file.write(model_json)
+model.save("/content/drive/MyDrive/DENTALDESIESE/res_dental_Classifier.h5")
+print("Saved model to disk")
+model.save_weights("/content/drive/MyDrive/DENTALDESIESE/res_dental.h5")'''
+
+11. Building the Streamlit App:
+   - Creating a new Python file, e.g., `app.py`, in our project directory.
+   - Importing the required libraries:
+     ```
+      %%writefile app.py
+      import streamlit as st
+      import keras.utils as image
+     from keras.applications.vgg16 import preprocess_input, decode_predictions
+     import numpy as np
+     from tensorflow import keras
+     import os
+     from PIL import Image
+     from drive.MyDrive.DENTALDESIESE.pred import rt
+     import base64
+
+    def add_bg_from_local(image_file):
+       with open(image_file, "rb") as image_file:
+        encoded_string = base64.b64encode(image_file.read())
+        st.markdown(
+        f"""
+        <style>
+        .stApp {{
+        background-image: url(data:image/{"png"};base64,{encoded_string.decode()});
+        background-size: cover
+        }}
+        </style>""",
+        unsafe_allow_html=True
+         )
+        add_bg_from_local('/content/drive/MyDrive/DENTALDESIESE/bg3.jpg')
+        st.title(" DENTAL CARIES PREDICTION")
+        model = keras.models.load_model       ( '/content/drive/MyDrive/DENTALDESIESE/res_dental_Classifier.h5')
+       file = st.file_uploader("Upload image", type=["jpg", "jpeg", "png"])
+       if file is not None:
+       image = Image.open(file)
+       image=image.resize((200, 200))
+       st.image(image, caption='Uploaded image.', use_column_width=True)
+       if not os.path.isdir('images'):
+          os.makedirs('images')
+        if file is not None:
+            with open(os.path.join("images/", 'test.jpg'), "wb") as f:
+             f.write(file.getbuffer())
+             img_path = 'images/test.jpg'
+             import keras.utils as image
+             img = image.load_img(img_path, target_size=(224, 224))
+             img_data = image.img_to_array(img)
+             img_data = np.expand_dims(img_data, axis=0)
+             img_data = preprocess_input(img_data)
+             preds = model.predict(img_data)
+
+if st.button(' PREDICT'):
+    st.write(preds)
+    image = Image.open(file)
+    image=image.resize((200, 200))
+    image = rt(image)
+    st.image(image, caption='Uploaded image.', use_column_width=True)
+    if preds[0][0]>preds[0][1]:
+        st.header('No Caries')
+    else:
+        st.header('Caries')
+     ```
+
+12. Set Up Local Tunnel with ngrok:
+   - Run with the following command in a code cell:
+     ```
+     !npm install localtunnel
+     ```
+   -Generating IP address:
+    '''  !curl ipv4.icanhazip.com  '''
+   -After running ngrok, you will see a forwarding URL in the terminal.
+    using below code:
+      !streamlit run /content/app.py &>/content/logs.txt &
+      !npx localtunnel --port 8501
+
+13. Access the Web App:
+   - Copy the forwarding URL (e.g., `https://tough-deer-know.loca.lt`).
+   - Share this URL with others or open it in a web browser to access the web app.
