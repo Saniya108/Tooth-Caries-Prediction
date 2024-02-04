@@ -1,0 +1,13 @@
+ **1.1 Existing System:**
+The DCP (Dental Caries Prediction) model, which implements preventive measures or
+diagnostic solutions for dental caries, was proposed for the current system. Using the
+Random Forest approach, extraneous features were removed from the data before it was
+balanced using the widely utilised oversampling technique. The model takes different
+parameters into considered and then predicts caries.
+
+**1.1.1 Limitations in the Existing System:**
+Random Forest struggles to accurately determine the importance of features when there
+are strong correlations between predictors. This algorithm is not easily interpretable like
+other algorithms. There is a need for a more efficient and accurate system for tooth caries
+prediction to improve patient outcomes and reduce the burden on dental professionals. It
+can be computationally expensive when dealing with large scale tooth caries datasets.
